@@ -1,5 +1,5 @@
 var makeGrid = function(x, y, w, h, childFactory) {
-    var all = new PIXI.ParticleContainer();
+    var all = new PIXI.Container();
     for (var i=0; i<x; i++) {
         for (var j=0; j<y; j++) {
             var c = childFactory();
@@ -11,120 +11,50 @@ var makeGrid = function(x, y, w, h, childFactory) {
     return all;
 }
 
+var makeRing = function(n, r, fac) {
+    var ring = new PIXI.Container();
+    var a = 2 * Math.PI / n;
+    for (var i=0; i<n; i++) {
+        var c = fac();
+        c.x = c.xx = Math.sin(a * i) * r;
+        c.y = c.yy = Math.cos(a * i) * r;
+        ring.addChild(c);
+    }
+    return ring;
+}
+
 
 var renderer = new PIXI.WebGLRenderer(1200, 800);
 document.body.appendChild(renderer.view);
 var stage = new PIXI.Container();
+// stage.filters = [new PIXI.filters.BlurFilter()];
 
 var _frame = 0;
-var _speed = 550;
+var _speed = 300000;
 var _step = 0;
 
 var animators = [];
 
 var g = new PIXI.Graphics();
 g.beginFill(0xDDDDDD);
-g.drawCircle(0, 0, 1);
+g.drawCircle(0, 0, 2);
 var dot = g.generateTexture();
 
-
 (function() {
     var s = function() { return new PIXI.Sprite(dot) };
-    var grid = makeGrid(20, 50, 3, 3, s);
-    grid.x = 200;
-    grid.y = 120;
-    stage.addChild(grid);
+    n = 900;
+    var a = 2 * Math.PI / n;
+    var ring = makeRing(n, 400, s);
+    ring.x = 300;
+    ring.y = 300;
+    stage.addChild(ring);
 
     animators.push(function() {
-        for (var i=0; i<grid.children.length; i++) {
-            var c = grid.children[i];
-            c.x = c.xx + 80 * Math.sin(_step + i);
-            c.y = c.yy + 90 * Math.cos(_step + i/2);
-        }
-    });
-})();
-
-
-(function() {
-    var s = function() { return new PIXI.Sprite(dot) };
-    var grid = makeGrid(30, 50, 6, 0, s);
-    grid.x = 500;
-    grid.y = 120;
-    stage.addChild(grid);
-
-    animators.push(function() {
-        for (var i=0; i<grid.children.length; i++) {
-            var c = grid.children[i];
-            c.x = c.xx + 40 * Math.cos(_step + i);
-            c.y = c.xx + 80 * Math.sin(_step + i);
-        }
-    });
-})();
-
-
-(function() {
-    var s = function() { return new PIXI.Sprite(dot) };
-    var grid = makeGrid(20, 20, 5, 8, s);
-    grid.x = 900;
-    grid.y = 120;
-    stage.addChild(grid);
-
-    animators.push(function() {
-        for (var i=0; i<grid.children.length; i++) {
-            var c = grid.children[i];
-            c.x = c.xx + 40 * Math.sin(_step + i);
-            c.y = c.yy + 80 * Math.cos(_step + i/3);
-        }
-    });
-})();
-
-
-(function() {
-    var s = function() { return new PIXI.Sprite(dot) };
-    var grid = makeGrid(50, 20, 5, 4, s);
-    grid.x = 100;
-    grid.y = 500;
-    stage.addChild(grid);
-
-    animators.push(function() {
-        for (var i=0; i<grid.children.length; i++) {
-            var c = grid.children[i];
-            c.x = c.xx + Math.sin(_step);
-            c.y = c.yy + 80 * Math.cos(_step + i/3);
-        }
-    });
-})();
-
-
-(function() {
-    var s = function() { return new PIXI.Sprite(dot) };
-    var grid = makeGrid(50, 20, 3, 4, s);
-    grid.x = 550;
-    grid.y = 500;
-    stage.addChild(grid);
-
-    animators.push(function() {
-        for (var i=0; i<grid.children.length; i++) {
-            var c = grid.children[i];
-            c.x = c.yy + 40 * Math.sin(_step + i);
-            c.y = c.xx + 80 * Math.cos(_step + i/3);
-        }
-    });
-})();
-
-
-(function() {
-    var s = function() { return new PIXI.Sprite(dot) };
-    var grid = makeGrid(20, 20, 6, 6, s);
-    grid.x = 800;
-    grid.y = 500;
-    stage.addChild(grid);
-
-    animators.push(function() {
-        for (var i=0; i<grid.children.length; i++) {
-            var c = grid.children[i];
-            c.x = c.yy + 40 * Math.abs(Math.log(Math.sin(_step + i)));
-            c.y = c.xx + 80 * Math.sin(_step + i/3);
+        for (var i=0; i<ring.children.length; i++) {
+            var c = ring.children[i];
+            a += _step;
+            c.x = Math.sin(a + i) * (200 + Math.sin(i) * 100);
+            c.y = Math.cos(a + i) * (200 + Math.sin(i) * 100);
         }
     });
 })();
